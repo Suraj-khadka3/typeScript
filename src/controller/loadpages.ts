@@ -1,26 +1,46 @@
 import { RequestHandler } from "express";
-import path from "path";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
-export const home: RequestHandler = (req, res) => {
+export const home: RequestHandler = async (req, res) => {
   if (req.url == "/home") {
-    res.sendFile(path.join(__dirname + "../../../views/index.html"));
+    const allUsers = await prisma.user.findMany();
+    res.status(201).json({ allUsers });
   }
 };
 
-export const register: RequestHandler = (req, res) => {
-  if (req.url == "/post") {
-    res.send("This is register");
+export const register: RequestHandler = async (req, res) => {
+  if (req.url == "/register") {
+    const { name, email } = req.body;
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+      },
+    });
+    res.status(201).json({ user });
   }
 };
 
-export const edit: RequestHandler = (req, res) => {
-  if (req.url == "/edit") {
-    res.send("this is edit");
+export const edit: RequestHandler = async (req, res) => {
+  if (!req.body) {
+    throw new Error("no change data found");
   }
+  const id: number = parseInt(req.params.id);
+  const { email, name } = req.body;
+  const update = await prisma.user.update({
+    where: { id },
+    data: { email, name },
+  });
+  res.status(201).json(update);
 };
 
-export const remove: RequestHandler = (req, res) => {
-  if (req.url == "/remove") {
-    res.send("this is remove");
+export const remove: RequestHandler = async (req, res) => {
+  if (!req.params.id) {
+    throw new Error("no ID given");
   }
+  const del = await prisma.user.delete({
+    where: { id: parseInt(req.params.id) },
+  });
+  res.status(201).json({ deletedUser: del });
 };
