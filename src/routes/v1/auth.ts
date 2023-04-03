@@ -6,8 +6,8 @@ router.get("/home", home);
 
 router.post("/register", register);
 
-router.patch("/edit", edit);
+router.patch("/edit:id", edit);
 
-router.delete("/remove", remove);
+router.delete("/remove:id", remove);
 
 export default router;

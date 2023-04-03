@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: ecplise
+      POSTGRES_PASSWORD: postgrace2023
+      POSTGRES_DB: user_db
+    volumes:
+      - ecpliseVolume:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  ecpliseVolume:
