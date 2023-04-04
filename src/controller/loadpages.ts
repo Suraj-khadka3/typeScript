@@ -23,7 +23,6 @@ export const register: RequestHandler = async (req, res) => {
 };
 
 export const edit: RequestHandler = async (req, res) => {
-  console.log(req.url)
   const id: number = parseInt(req.params.id);
   const { email, name } = req.body;
   const update = await prisma.user.update({
