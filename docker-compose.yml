@@ -4,13 +4,13 @@ services:
   db:
     image: postgres:12
     environment:
-      POSTGRES_USER: ecplise
-      POSTGRES_PASSWORD: postgrace2023
-      POSTGRES_DB: user_db
+      POSTGRES_USER: safal
+      POSTGRES_PASSWORD: safal123
+      POSTGRES_DB: safaldb
     volumes:
-      - ecpliseVolume:/var/lib/postgresql/data
+      - safalVolume:/var/lib/postgresql/data
     ports:
       - '5432:5432'
 
 volumes:
-  ecpliseVolume:
+  safalVolume:
