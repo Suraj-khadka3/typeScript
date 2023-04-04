@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { home, register, edit, remove } from "../../controller/loadpages";
+
 const router = Router();
 
 router.get("/home", home);
