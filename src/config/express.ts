@@ -17,16 +17,13 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json())
 
 const portNumber = process.env.PORT;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(cookieParser());
 
 app.use(compress());
 
-app.use(helmet);
+app.use(helmet());
 
 app.use(cors());
 
@@ -37,11 +34,3 @@ app.listen(portNumber, () => {
 });
 
 app.use(router);
-
-// app.use((error: Error, req: Request, res: Response) => {
-//   if (error) {
-//     res.json({
-//       message: `${req.url} cannot be reached because of ${error.message}`,
-//     });
-//   }
-// });

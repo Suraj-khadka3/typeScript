@@ -23,9 +23,7 @@ export const register: RequestHandler = async (req, res) => {
 };
 
 export const edit: RequestHandler = async (req, res) => {
-  if (!req.body) {
-    throw new Error("no change data found");
-  }
+  console.log("hi")
   const id: number = parseInt(req.params.id);
   const { email, name } = req.body;
   const update = await prisma.user.update({
