@@ -20,17 +20,21 @@
 import { Schema } from "express-validator";
 
 export const loginValidation: Schema = {
-  name: {
-    notEmpty: {
-      errorMessage: "name is required",
-    },
-  },
   email: {
     notEmpty: {
       errorMessage: "email is required",
     },
     isEmail: {
       errorMessage: "email is invalid",
+    },
+  },
+  pwd: {
+    notEmpty: {
+      errorMessage: "password is required",
+    },
+    isLength: {
+      errorMessage: "password must be at least 8 words",
+      options: { min: 8 },
     },
   },
 };
