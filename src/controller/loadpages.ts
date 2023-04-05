@@ -2,6 +2,12 @@ import { RequestHandler } from "express";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+interface userData {
+  name: string;
+  pwd: string;
+  email: string;
+}
+
 export const home: RequestHandler = async (_req, res) => {
   try {
     const allUsers = await prisma.user.findMany();
@@ -12,12 +18,13 @@ export const home: RequestHandler = async (_req, res) => {
 };
 
 export const register: RequestHandler = async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, pwd }: userData = req.body;
   try {
     const user = await prisma.user.create({
       data: {
         name,
         email,
+        pwd,
       },
     });
     res.status(201).json({ user });
@@ -28,7 +35,7 @@ export const register: RequestHandler = async (req, res) => {
 
 export const edit: RequestHandler = async (req, res) => {
   const id: number = parseInt(req.params.id);
-  const { email, name } = req.body;
+  const { email, name }: userData = req.body;
   try {
     const update = await prisma.user.update({
       where: { id },
