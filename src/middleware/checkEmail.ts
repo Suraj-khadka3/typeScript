@@ -27,6 +27,7 @@ export const loginValidation: Schema = {
     isEmail: {
       errorMessage: "email is invalid",
     },
+    normalizeEmail: true,
   },
   pwd: {
     notEmpty: {
