@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { PrismaClient } from "@prisma/client";
-// import {  Prisma } from '../../node_modules/.prisma/client/index';
+import { ProjectError } from "../utils/errors";
 
 const prisma = new PrismaClient();
 
@@ -25,18 +25,18 @@ export const home: RequestHandler = async (_req, res) => {
 };
 
 export const register: RequestHandler = async (req, res) => {
-  const { name, email, pwd }: userData = req.body;
+  const { name, pwd, email }: userData = req.body;
+  const data: userData = {
+    name,
+    pwd,
+    email,
+  };
   try {
     const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        pwd,
-      },
+      data,
     });
     res.status(201).json({ user });
   } catch (error) {
-    console.log(error);
     res.status(400).json(error);
   }
 };
@@ -64,7 +64,6 @@ export const remove: RequestHandler = async (req, res) => {
     });
     res.status(201).json({ deletedUser: del, deletedPosts: delpost });
   } catch (error) {
-    console.log(error);
     res.status(400).json(error);
   }
 };
@@ -78,22 +77,22 @@ export const post: RequestHandler = async (req, res) => {
     });
     res.status(200).json({ post });
   } catch (error) {
-    console.log(error);
     res.status(401).json({ error });
   }
 };
 
-export const login: RequestHandler = async (req, res) => {
+export const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, pwd } = req.body;
-    const login = await prisma.user
-      .findUnique({ where: { email } })
-      .then((data) => {
-        if (!data) throw new Error("Email not found");
-        if (data.pwd == pwd)
-          res.status(201).json({ loggedIn: login }).redirect("/home");
-      });
+    const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+    if (user.pwd == pwd) res.status(201).json({ loggedIn: user });
+    next();
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(401).json(
+      new ProjectError({
+        name: "Post Error",
+        message: "Email or Password is invalid",
+      })
+    );
   }
 };
