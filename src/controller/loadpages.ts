@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { PrismaClient } from "@prisma/client";
 import { ProjectError } from "../utils/errors";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -20,15 +21,22 @@ export const home: RequestHandler = async (_req, res) => {
     const allUsers = await prisma.user.findMany();
     res.status(201).json({ allUsers });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(401).json(
+      new ProjectError({
+        name: "Request Error",
+        message: "You are not logged in",
+      })
+    );
   }
 };
 
 export const register: RequestHandler = async (req, res) => {
   const { name, pwd, email }: userData = req.body;
+  const hashedPassword = await bcrypt.hash(pwd, 10);
+
   const data: userData = {
     name,
-    pwd,
+    pwd: hashedPassword,
     email,
   };
   try {
@@ -37,7 +45,12 @@ export const register: RequestHandler = async (req, res) => {
     });
     res.status(201).json({ user });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(401).json(
+      new ProjectError({
+        name: "Post Error",
+        message: "Invalid Request",
+      })
+    );
   }
 };
 
@@ -51,7 +64,12 @@ export const edit: RequestHandler = async (req, res) => {
     });
     res.status(201).json(update);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(401).json(
+      new ProjectError({
+        name: "Request Error",
+        message: "User does not exist",
+      })
+    );
   }
 };
 
@@ -64,7 +82,12 @@ export const remove: RequestHandler = async (req, res) => {
     });
     res.status(201).json({ deletedUser: del, deletedPosts: delpost });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(401).json(
+      new ProjectError({
+        name: "Request Error",
+        message: "User does not exist",
+      })
+    );
   }
 };
 
@@ -77,16 +100,25 @@ export const post: RequestHandler = async (req, res) => {
     });
     res.status(200).json({ post });
   } catch (error) {
-    res.status(401).json({ error });
+    res.status(401).json(
+      new ProjectError({
+        name: "Authentication Error",
+        message: "Cannot post without logging in",
+      })
+    );
   }
 };
 
-export const login: RequestHandler = async (req, res, next) => {
+export const login: RequestHandler = async (req, res) => {
   try {
     const { email, pwd } = req.body;
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
-    if (user.pwd == pwd) res.status(201).json({ loggedIn: user });
-    next();
+    const comparePassword: boolean = await bcrypt.compare(pwd, user.pwd);
+    if (comparePassword) {
+      res.status(201).json({ loggedIn: user });
+    } else {
+      throw new Error("Post Error");
+    }
   } catch (error) {
     res.status(401).json(
       new ProjectError({
