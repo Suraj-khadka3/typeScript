@@ -6,6 +6,7 @@ export class ProjectError extends Error {
 
   constructor({ name, message }: { name: ErrorName; message: string }) {
     super();
+    //super must be called before using this. ... because it is used to get properties of parent
     this.name = name;
     this.message = message;
   }
