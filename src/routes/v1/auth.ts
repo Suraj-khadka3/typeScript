@@ -6,13 +6,29 @@ import {
   remove,
   post,
   login,
-} from "../../controller/loadpages";
+} from "../../controller/userController";
 import { loginValidation } from "../../middleware/checkEmail";
 import validate from "../../utils/dummyUtils";
+import { searchPaginationSortMiddleware } from "../../middleware/sortSearch";
+import { posts } from "../../controller/postController";
 const router = Router();
 
-router.get("/home", home);
-
+router.get(
+  "/home",
+  searchPaginationSortMiddleware({
+    model: "User",
+    searchableFields: ["name", "email"],
+  }),
+  home
+);
+router.get(
+  "/posts/:id",
+  searchPaginationSortMiddleware({
+    model: "Post",
+    searchableFields: ["title", "body"],
+  }),
+  posts
+);
 router.post(
   "/register",
   validate(loginValidation),
