@@ -21,7 +21,6 @@ export const home: RequestHandler = async (_req, res) => {
     const allUsers = res.locals.data;
     res.status(201).json({ allUsers });
   } catch (error) {
-    console.log(error);
     res.status(401).json(
       new ProjectError({
         name: "Request Error",
