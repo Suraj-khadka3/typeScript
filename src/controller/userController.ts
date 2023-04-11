@@ -115,7 +115,7 @@ export const login: RequestHandler = async (req, res) => {
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
     const comparePassword: boolean = await bcrypt.compare(pwd, user.pwd);
     if (comparePassword) {
-      res.status(201).json({ loggedIn: user });
+      res.status(201).json({ loggedIn: user }).redirect("/api/home");
     } else {
       throw new Error("Post Error");
     }

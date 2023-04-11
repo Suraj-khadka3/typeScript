@@ -52,27 +52,33 @@ export const searchPaginationSortMiddleware = ({
           skip,
           take: limitNum,
         });
-        const totalPages = Math.ceil(allRecords.length / limitNum);
+        const allData = await (prisma as any)[modelName].findMany({
+          where: { userId: id },
+        });
+        console.log(allData.length, limitNum);
+        const totalPages = Math.ceil(allData.length / limitNum);
         const currentPage = pageNum;
         res.locals.data = { allRecords, totalPages, currentPage };
         return next();
       }
 
       const searchQueries = searchableFields.map((field) => ({
-        [field]: { contains: [search], mode: "insensitive" },
+        [field]: {
+          contains: search,
+          mode: "insensitive",
+        },
       }));
 
-      const allData = await (prisma as any)[modelName].findMany({
-        where: searchQueries,
-      });
-
       const searchedRecords = await (prisma as any)[modelName].findMany({
-        where: { OR: [{ userId: id }, searchQueries] },
+        where: { OR: searchQueries },
         orderBy,
         skip,
         take: limitNum,
       });
 
+      const allData = await (prisma as any)[modelName].findMany({
+        where: { OR: searchQueries },
+      });
       const found = allData.length;
       const totalPages = Math.ceil(found / limitNum);
 
