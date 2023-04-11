@@ -18,7 +18,7 @@ interface post {
 
 export const home: RequestHandler = async (_req, res) => {
   try {
-    const allUsers = await prisma.user.findMany();
+    const allUsers = res.locals.data;
     res.status(201).json({ allUsers });
   } catch (error) {
     res.status(401).json(
