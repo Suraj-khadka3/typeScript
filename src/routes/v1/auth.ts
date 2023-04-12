@@ -11,6 +11,8 @@ import { loginValidation } from "../../middleware/checkEmail";
 import validate from "../../utils/dummyUtils";
 import { searchPaginationSortMiddleware } from "../../middleware/sortSearch";
 import { posts } from "../../controller/postController";
+import verifyJWT from "../../middleware/verifyJWT";
+
 const router = Router();
 
 router.get(
@@ -29,14 +31,9 @@ router.get(
   }),
   posts
 );
-router.post(
-  "/register",
-  validate(loginValidation),
-  // validate,
-  register
-);
+router.post("/register", validate(loginValidation), register);
 
-router.post("/post", post);
+router.post("/post", verifyJWT, post);
 
 router.patch("/edit/:id", edit);
 

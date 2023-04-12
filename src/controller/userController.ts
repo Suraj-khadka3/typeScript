@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { PrismaClient } from "@prisma/client";
 import { ProjectError } from "../utils/errors";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -115,7 +116,16 @@ export const login: RequestHandler = async (req, res) => {
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
     const comparePassword: boolean = await bcrypt.compare(pwd, user.pwd);
     if (comparePassword) {
-      res.status(201).json({ loggedIn: user }).redirect("/api/home");
+      var signedToken = jwt.sign({ user }, process.env.JWT_SECRET!, {
+        expiresIn: "1d",
+      });
+      res
+        .status(201)
+        .cookie("jwt", signedToken, {
+          httpOnly: true,
+          maxAge: 2 * 24 * 60 * 60 * 1000,
+        })
+        .redirect("/api/home");
     } else {
       throw new Error("Post Error");
     }

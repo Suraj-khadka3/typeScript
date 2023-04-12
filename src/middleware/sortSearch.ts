@@ -16,10 +16,10 @@ interface SearchPaginationSortArgs {
   order?: "asc" | "desc";
 }
 
-type UserOrderByInput = {
+interface UserOrderByInput {
   id?: "asc" | "desc";
   name?: "asc" | "desc";
-};
+}
 
 export const searchPaginationSortMiddleware = ({
   model,
@@ -55,7 +55,6 @@ export const searchPaginationSortMiddleware = ({
         const allData = await (prisma as any)[modelName].findMany({
           where: { userId: id },
         });
-        console.log(allData.length, limitNum);
         const totalPages = Math.ceil(allData.length / limitNum);
         const currentPage = pageNum;
         res.locals.data = { allRecords, totalPages, currentPage };
@@ -90,7 +89,6 @@ export const searchPaginationSortMiddleware = ({
       };
       return next();
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ message: "Internal server error" });
     }
   };
